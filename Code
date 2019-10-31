@@ -1,0 +1,75 @@
+/* HALLOWEN SURPRISE
+
+  By: Alejandro Fernandez, Mateu Tur, David Valls
+  ELISAVA
+*/
+
+
+// Variables sensor
+const int EchoPin = 10;
+const int TriggerPin = 9;
+//variables servo
+#include <Servo.h>
+Servo servoMotor;  // create servo object to control a servo
+//OTRAS VARIABLES
+int distancia = 100;  //in cm
+
+void setup() {
+  Serial.begin(9600);
+// motor
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+
+  pinMode(TriggerPin, OUTPUT);
+  pinMode(EchoPin, INPUT);
+  //setup servo
+  servoMotor.attach(6);
+  //setup motor
+  pinMode(3, OUTPUT);
+
+  servoMotor.write(90);
+}
+
+void loop() {
+  int cm = ping(TriggerPin, EchoPin);
+  Serial.print("Distancia: ");
+  Serial.println(cm);
+  delay(250);
+  digitalWrite(3, OUTPUT);
+  if (cm < distancia) {
+
+    // Desplazamos a la posición ABIERTO
+    servoMotor.write(0);
+    // Esperamos tiempo de sustiko
+    delay(4000);
+    digitalWrite(4, HIGH); //motor recogiendo hilo
+    delay(1700);
+   
+    digitalWrite(4, LOW);
+    // Desplazamos a la posición cerrada
+    servoMotor.write(90);
+    delay(1300);
+    digitalWrite(5, HIGH); //motor suelta hilo
+    delay(500);
+    digitalWrite(5, LOW);
+  }
+
+}
+
+//funcion sensor
+
+int ping(int TriggerPin, int EchoPin) {
+  long duration, distanceCm;
+
+  digitalWrite(TriggerPin, LOW);  //para generar un pulso limpio ponemos a LOW 4us
+  delayMicroseconds(4);
+  digitalWrite(TriggerPin, HIGH);  //generamos Trigger (disparo) de 10us
+  delayMicroseconds(10);
+  digitalWrite(TriggerPin, LOW);
+
+  duration = pulseIn(EchoPin, HIGH);  //medimos el tiempo entre pulsos, en microsegundos
+
+  distanceCm = duration * 10 / 292 / 2;  //convertimos a distancia, en cm
+  return distanceCm;
+}
